@@ -1,0 +1,18 @@
+#!/bin/bash
+# ingen.make-default-outputs
+
+
+! $(ingenish get /left_out | grep -v @prefix | egrep -v ^$ > /dev/null) && \
+    ingenish put /left_out 'a lv2:OutputPort ; a lv2:AudioPort ; lv2:name "Left Out"' > /dev/null
+! $(ingenish get /right_out | grep -v @prefix | egrep -v ^$ > /dev/null) && \
+    ingenish put /right_out 'a lv2:OutputPort ; a lv2:AudioPort ; lv2:name "Right Out"' > /dev/null
+if ! $(ingenish get /limiter | grep -v @prefix | egrep -v ^$ > /dev/null); then
+    ingenish put /limiter 'a ingen:Block ; lv2:prototype <http://plugin.org.uk/swh-plugins/fastLookaheadLimiter>' > /dev/null
+    ingenish connect /limiter/out_1 /left_out
+    ingenish connect /limiter/out_2 /right_out
+fi
+
+
+
+jack_connect ingen:left_out system:playback_1
+jack_connect ingen:right_out system:playback_2
